@@ -7,6 +7,36 @@ namespace InstantBase.Items
 {
     public class InstantBaseItem : ModItem
     {
+        private readonly string[] frameBlueprint =
+            {
+                "###########",
+                "#.........#",
+                "#.........#",
+                "#.........#",
+                "#.........#",
+                "###########"
+            };
+
+        private readonly string[] wallBlueprint =
+            {
+                "...........",
+                ".WWWWWWWWW.",
+                ".WWWWWWWWW.",
+                ".WWWWWWWWW.",
+                ".WWWWWWWWW.",
+                "..........."
+            };
+
+        private readonly string[] foregroundBlueprint =
+            {
+                "           ",
+                "           ",
+                "     T     ",
+                "           ",
+                "           ",
+                "           "
+            };
+
         public override void SetStaticDefaults()
         {
             Item.ResearchUnlockCount = 1;
@@ -23,10 +53,10 @@ namespace InstantBase.Items
             Item.useTurn = true;
             Item.autoReuse = false;
 
-            Item.maxStack = 9999;
+            Item.maxStack = 1;
             Item.consumable = false;
 
-            Item.rare = ItemRarityID.Blue;
+            Item.rare = ItemRarityID.White;
             Item.value = Item.buyPrice(silver:50);
 
             Item.UseSound = SoundID.Item1;
@@ -36,39 +66,80 @@ namespace InstantBase.Items
         {
             Point tilePosition = Main.MouseWorld.ToTileCoordinates();
 
-            string [] blueprint =
-            {
-                "##########",
-                "#........#",
-                "#........#",
-                "#........#",
-                "#........#",
-                "##########"
-            };
-
             ClearArea(
                 tilePosition.X,
                 tilePosition.Y,
-                blueprint[0].Length,
-                blueprint.Length
+                frameBlueprint[0].Length,
+                frameBlueprint.Length
             );
 
-            for (int y = 0; y < blueprint.Length; y++)
+            PlaceFrame(tilePosition);
+            PlaceWalls(tilePosition);
+            PlaceForeground(tilePosition);
+
+            WorldGen.RangeFrame(
+                tilePosition.X,
+                tilePosition.Y,
+                tilePosition.X + frameBlueprint[0].Length,
+                tilePosition.Y + frameBlueprint.Length
+            );
+
+            return true;
+        }
+
+        private void PlaceFrame(Point origin)
+        {
+            for (int y = 0; y < frameBlueprint.Length; y++)
             {
-                for (int x = 0; x < blueprint[y].Length; x++)
+                for (int x = 0; x < frameBlueprint[y].Length; x++)
                 {
-                    if (blueprint[y][x] == '#')
+                    if (frameBlueprint[y][x] == '#')
                     {
                         WorldGen.PlaceTile(
-                            tilePosition.X + x,
-                            tilePosition.Y + y,
+                            origin.X + x,
+                            origin.Y + y,
                             TileID.WoodBlock
                         );
                     }
                 }
             }
+        }
 
-            return true;
+        private void PlaceWalls(Point origin)
+        {
+            for (int y = 0; y < wallBlueprint.Length; y++)
+            {
+                for (int x = 0; x < wallBlueprint[y].Length; x++)
+                {
+                    if (wallBlueprint[y][x] == 'W')
+                    {
+                        int wallX = origin.X + x;
+                        int wallY = origin.Y + y;
+
+                        Main.tile[wallX, wallY].WallType = WallID.Wood;
+
+                        WorldGen.SquareWallFrame(wallX, wallY);
+                    }
+                }
+            }
+        }
+
+        private void PlaceForeground(Point origin)
+        {
+            for (int y = 0; y < foregroundBlueprint.Length; y++)
+            {
+                for (int x = 0; x < foregroundBlueprint[y].Length; x++)
+                {
+                    if (foregroundBlueprint[y][x] == 'T')
+                    {
+                        WorldGen.PlaceTile(
+                            origin.X + x,
+                            origin.Y + y,
+                            TileID.Torches
+                        );
+                    }
+                }
+            }
         }
 
         private void ClearArea(int startX, int startY, int width, int height)
