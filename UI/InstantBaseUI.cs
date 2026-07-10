@@ -2,6 +2,8 @@ using Terraria.UI;
 using Microsoft.Xna.Framework;
 using Terraria.GameContent.UI.Elements;
 using InstantBase.Items;
+using Terraria;
+using Terraria.ID;
 
 namespace InstantBase.UI
 {
@@ -11,8 +13,18 @@ namespace InstantBase.UI
 
         private InstantBaseItem currentItem;
 
+        private MaterialSlot frameSlot;
+
         public override void OnInitialize()
         {
+        }
+
+        public void Open(InstantBaseItem item)
+        {
+            currentItem = item;
+
+            RemoveAllChildren();
+
             panel = new UIPanel();
 
             panel.Width.Set(300f, 0f);
@@ -22,11 +34,25 @@ namespace InstantBase.UI
             panel.Top.Set(100f, 0f);
 
             Append(panel);
+
+            frameSlot = new MaterialSlot();
+
+            frameSlot.SetTile(TileID.WoodBlock);
+
+            frameSlot.Left.Set(120f, 0f);
+            frameSlot.Top.Set(70f, 0f);
+
+            panel.Append(frameSlot);
         }
 
-        public void Open(InstantBaseItem item)
+        public override void Update(GameTime gameTime)
         {
-            currentItem = item;
+            base.Update(gameTime);
+
+            if (currentItem != null && frameSlot != null)
+            {
+                currentItem.SetFrameTile(frameSlot.SelectedTile);
+            }
         }
     }
 }

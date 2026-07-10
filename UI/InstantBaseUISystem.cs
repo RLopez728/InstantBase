@@ -26,6 +26,11 @@ namespace InstantBase.UI
 
         public override void UpdateUI(GameTime gameTime)
         {
+            if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+            {
+                _userInterface.SetState(null);
+            }
+            
             _userInterface?.Update(gameTime);
         }
 

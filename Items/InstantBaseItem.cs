@@ -223,6 +223,11 @@ namespace InstantBase.Items
             WorldGen.SquareTileFrame(x, y);
         }
 
+        public void SetFrameTile(ushort tile)
+        {
+            materials.FrameTile = tile;
+        }
+
         private void ClearArea(int startX, int startY, int width, int height)
         {
             for (int x = startX; x < startX + width; x++)
