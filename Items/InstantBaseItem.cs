@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Text;
 using InstantBase.Structures;
+using InstantBase.UI;
 
 namespace InstantBase.Items
 {
@@ -24,10 +25,6 @@ namespace InstantBase.Items
         public override void SetStaticDefaults()
         {
             Item.ResearchUnlockCount = 1;
-
-            // frameBlueprint = LoadBlueprint("Assets/Structures/Frame.txt");
-            // wallBlueprint = LoadBlueprint("Assets/Structures/Walls.txt");
-            // foregroundBlueprint = LoadBlueprint("Assets/Structures/Foreground.txt");
         }
 
         public override void SetDefaults()
@@ -52,6 +49,12 @@ namespace InstantBase.Items
 
         public override bool? UseItem(Player player)
         {
+            if (player.altFunctionUse == 2)
+            {
+                ModContent.GetInstance<InstantBaseUISystem>().ShowUI(this);
+                return true;
+            }
+
             frameBlueprint ??= LoadBlueprint("Assets/Structures/Frame.txt");
             wallBlueprint ??= LoadBlueprint("Assets/Structures/Walls.txt");
             foregroundBlueprint ??= LoadBlueprint("Assets/Structures/Foreground.txt");
@@ -95,6 +98,21 @@ namespace InstantBase.Items
             );
 
             return true;
+        }
+
+        public override bool AltFunctionUse(Player player)
+        {
+            return true;
+        }
+
+        public override bool CanUseItem(Player player)
+        {
+            if (player.altFunctionUse == 2)
+            {
+                return true;
+            }
+
+            return base.CanUseItem(player);
         }
 
         private string[] LoadBlueprint(String path)
