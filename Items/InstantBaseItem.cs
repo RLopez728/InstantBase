@@ -2,40 +2,16 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using System;
+using System.Text;
 
 namespace InstantBase.Items
 {
     public class InstantBaseItem : ModItem
     {
-        private readonly string[] frameBlueprint =
-            {
-                "###########",
-                "#         #",
-                "#         #",
-                "#         #",
-                "#         #",
-                "###     ###"
-            };
-
-        private readonly string[] wallBlueprint =
-            {
-                "           ",
-                " WWWWWWWWW ",
-                " WWWWWWWWW ",
-                " WWWWWWWWW ",
-                " WWWWWWWWW ",
-                "           "
-            };
-
-        private readonly string[] foregroundBlueprint =
-            {
-                "           ",
-                "           ",
-                "     T     ",
-                "           ",
-                "           ",
-                "   PPPPP   "
-            };
+        private string[] frameBlueprint;
+        private string[] wallBlueprint;
+        private string[] foregroundBlueprint;
 
         private ushort frameTile = TileID.WoodBlock;
         private ushort wallType = WallID.Wood;
@@ -44,6 +20,10 @@ namespace InstantBase.Items
         public override void SetStaticDefaults()
         {
             Item.ResearchUnlockCount = 1;
+
+            // frameBlueprint = LoadBlueprint("Assets/Structures/Frame.txt");
+            // wallBlueprint = LoadBlueprint("Assets/Structures/Walls.txt");
+            // foregroundBlueprint = LoadBlueprint("Assets/Structures/Foreground.txt");
         }
 
         public override void SetDefaults()
@@ -68,6 +48,10 @@ namespace InstantBase.Items
 
         public override bool? UseItem(Player player)
         {
+            frameBlueprint ??= LoadBlueprint("Assets/Structures/Frame.txt");
+            wallBlueprint ??= LoadBlueprint("Assets/Structures/Walls.txt");
+            foregroundBlueprint ??= LoadBlueprint("Assets/Structures/Foreground.txt");
+
             Point tilePosition = Main.MouseWorld.ToTileCoordinates();
 
             ClearArea(
@@ -88,7 +72,39 @@ namespace InstantBase.Items
                 tilePosition.Y + frameBlueprint.Length
             );
 
+            if (frameBlueprint == null)
+                {
+                    Main.NewText("Frame blueprint is NULL!");
+                    return false;
+                }
+
+            if (wallBlueprint == null)
+                {
+                    Main.NewText("Wall blueprint is NULL!");
+                    return false;
+                }
+
+            if (foregroundBlueprint == null)
+                {
+                    Main.NewText("Foreground blueprint is NULL!");
+                    return false;
+                }
+
             return true;
+        }
+
+        private string[] LoadBlueprint(String path)
+        {
+            byte[] bytes = Mod.GetFileBytes(path);
+
+            if (bytes == null)
+                throw new Exception($"Couldn't find blueprint: {path}");
+
+            string text = Encoding.UTF8.GetString(bytes);
+
+            return text
+                .Replace("\r", "")
+                .Split('\n', StringSplitOptions.RemoveEmptyEntries);
         }
 
         private void PlaceFrame(Point origin)
@@ -134,7 +150,7 @@ namespace InstantBase.Items
             {
                 for (int x = 0; x < foregroundBlueprint[y].Length; x++)
                 {
-                    if (foregroundBlueprint[y][x] == 'T')
+                    if (foregroundBlueprint[y][x] == 'E')
                     {
                         WorldGen.PlaceTile(
                             origin.X + x,
@@ -150,8 +166,39 @@ namespace InstantBase.Items
                             platformTile
                         );
                     }
+                    else if (foregroundBlueprint[y][x] == 'H')
+                    {
+                        PlaceRightSlopePlatform(
+                            origin.X + x,
+                            origin.Y + y
+                        );
+                    }
+                    else if (foregroundBlueprint[y][x] == 'R')
+                    {
+                        WorldGen.PlaceTile(
+                            origin.X + x,
+                            origin.Y + y,
+                            TileID.Rope
+                        );
+                    }
                 }
             }
+        }
+
+        private void PlaceRightSlopePlatform(int x, int y)
+        {
+            WorldGen.PlaceTile(
+                x,
+                y,
+                platformTile
+            );
+
+            Tile tile = Main.tile[x, y];
+
+            tile.Slope = SlopeType.SlopeDownLeft;
+            tile.IsHalfBlock = false;
+
+            WorldGen.SquareTileFrame(x, y);
         }
 
         private void ClearArea(int startX, int startY, int width, int height)
@@ -162,7 +209,7 @@ namespace InstantBase.Items
                 {
                     WorldGen.KillTile(x,y);
 
-                    Main.tile[x,y].WallType = 0;
+                    Main.tile[x,y].WallType = WallID.None;
                     Main.tile[x,y].LiquidAmount = 0;
                 }
             }
