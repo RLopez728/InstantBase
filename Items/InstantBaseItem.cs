@@ -10,21 +10,21 @@ namespace InstantBase.Items
         private readonly string[] frameBlueprint =
             {
                 "###########",
-                "#.........#",
-                "#.........#",
-                "#.........#",
-                "#.........#",
-                "###########"
+                "#         #",
+                "#         #",
+                "#         #",
+                "#         #",
+                "###     ###"
             };
 
         private readonly string[] wallBlueprint =
             {
-                "...........",
-                ".WWWWWWWWW.",
-                ".WWWWWWWWW.",
-                ".WWWWWWWWW.",
-                ".WWWWWWWWW.",
-                "..........."
+                "           ",
+                " WWWWWWWWW ",
+                " WWWWWWWWW ",
+                " WWWWWWWWW ",
+                " WWWWWWWWW ",
+                "           "
             };
 
         private readonly string[] foregroundBlueprint =
@@ -34,8 +34,12 @@ namespace InstantBase.Items
                 "     T     ",
                 "           ",
                 "           ",
-                "           "
+                "   PPPPP   "
             };
+
+        private ushort frameTile = TileID.WoodBlock;
+        private ushort wallType = WallID.Wood;
+        private ushort platformTile = TileID.Platforms;
 
         public override void SetStaticDefaults()
         {
@@ -98,7 +102,7 @@ namespace InstantBase.Items
                         WorldGen.PlaceTile(
                             origin.X + x,
                             origin.Y + y,
-                            TileID.WoodBlock
+                            frameTile
                         );
                     }
                 }
@@ -116,7 +120,7 @@ namespace InstantBase.Items
                         int wallX = origin.X + x;
                         int wallY = origin.Y + y;
 
-                        Main.tile[wallX, wallY].WallType = WallID.Wood;
+                        Main.tile[wallX, wallY].WallType = wallType;
 
                         WorldGen.SquareWallFrame(wallX, wallY);
                     }
@@ -136,6 +140,14 @@ namespace InstantBase.Items
                             origin.X + x,
                             origin.Y + y,
                             TileID.Torches
+                        );
+                    }
+                    else if (foregroundBlueprint[y][x] == 'P')
+                    {
+                        WorldGen.PlaceTile(
+                            origin.X + x,
+                            origin.Y + y,
+                            platformTile
                         );
                     }
                 }
