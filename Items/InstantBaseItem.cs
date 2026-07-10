@@ -3,6 +3,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using System;
+using System.Linq;
 using System.Text;
 using InstantBase.Structures;
 using InstantBase.UI;
@@ -25,6 +26,8 @@ namespace InstantBase.Items
         private Item frameSelectionItem = new Item();
         private Item wallSelectionItem = new Item();
         private Item platformSelectionItem = new Item();
+
+        private ushort? houseEnablerTileId;
 
         public override void SetStaticDefaults()
         {
@@ -185,7 +188,7 @@ namespace InstantBase.Items
                         WorldGen.PlaceTile(
                             origin.X + x,
                             origin.Y + y,
-                            TileID.Torches
+                            GetHouseEnablerTileId()
                         );
                     }
                     else if (foregroundBlueprint[y][x] == 'P')
@@ -213,6 +216,30 @@ namespace InstantBase.Items
                     }
                 }
             }
+        }
+
+        private ushort GetHouseEnablerTileId()
+        {
+            if (houseEnablerTileId.HasValue)
+                return houseEnablerTileId.Value;
+
+            if (ModLoader.TryGetMod("miningcracks_take_on_luiafk", out Mod luiAfk))
+            {
+                ModItem match = luiAfk.GetContent<ModItem>()
+                .FirstOrDefault(modItem =>
+                    modItem.DisplayName.Value.Equals("Unlimited House Enabler")
+                );
+
+                if (match != null && match.Item.createTile >= 0)
+                {
+                    houseEnablerTileId = (ushort)match.Item.createTile;
+                    return houseEnablerTileId.Value;
+                }
+            }
+
+            Main.NewText("LuiAFK Reborn's Unlimited House Enabler not found - falling back to torches.");
+            houseEnablerTileId = TileID.Torches;
+            return houseEnablerTileId.Value;
         }
 
         private void PlaceRightSlopePlatform(int x, int y)

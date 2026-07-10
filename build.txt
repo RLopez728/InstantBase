@@ -1,3 +1,4 @@
 displayName = Instant Base (LuiAFK)
 author = RixZC, HundredPlus
 version = 0.7
+weakReference = miningtracks_take_on_luiafk
