@@ -4,6 +4,7 @@ using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using System;
 using System.Text;
+using InstantBase.Structures;
 
 namespace InstantBase.Items
 {
@@ -13,9 +14,12 @@ namespace InstantBase.Items
         private string[] wallBlueprint;
         private string[] foregroundBlueprint;
 
-        private ushort frameTile = TileID.WoodBlock;
-        private ushort wallType = WallID.Wood;
-        private ushort platformTile = TileID.Platforms;
+        private BuildMaterials materials = new BuildMaterials()
+        {
+            FrameTile = TileID.GrayBrick,
+            WallType = WallID.GrayBrick,
+            PlatformTile = TileID.Platforms
+        };
 
         public override void SetStaticDefaults()
         {
@@ -52,6 +56,24 @@ namespace InstantBase.Items
             wallBlueprint ??= LoadBlueprint("Assets/Structures/Walls.txt");
             foregroundBlueprint ??= LoadBlueprint("Assets/Structures/Foreground.txt");
 
+            if (frameBlueprint == null)
+                {
+                    Main.NewText("Frame blueprint is NULL!");
+                    return false;
+                }
+
+            if (wallBlueprint == null)
+                {
+                    Main.NewText("Wall blueprint is NULL!");
+                    return false;
+                }
+
+            if (foregroundBlueprint == null)
+                {
+                    Main.NewText("Foreground blueprint is NULL!");
+                    return false;
+                }
+
             Point tilePosition = Main.MouseWorld.ToTileCoordinates();
 
             ClearArea(
@@ -71,24 +93,6 @@ namespace InstantBase.Items
                 tilePosition.X + frameBlueprint[0].Length,
                 tilePosition.Y + frameBlueprint.Length
             );
-
-            if (frameBlueprint == null)
-                {
-                    Main.NewText("Frame blueprint is NULL!");
-                    return false;
-                }
-
-            if (wallBlueprint == null)
-                {
-                    Main.NewText("Wall blueprint is NULL!");
-                    return false;
-                }
-
-            if (foregroundBlueprint == null)
-                {
-                    Main.NewText("Foreground blueprint is NULL!");
-                    return false;
-                }
 
             return true;
         }
@@ -118,7 +122,7 @@ namespace InstantBase.Items
                         WorldGen.PlaceTile(
                             origin.X + x,
                             origin.Y + y,
-                            frameTile
+                            materials.FrameTile
                         );
                     }
                 }
@@ -136,7 +140,7 @@ namespace InstantBase.Items
                         int wallX = origin.X + x;
                         int wallY = origin.Y + y;
 
-                        Main.tile[wallX, wallY].WallType = wallType;
+                        Main.tile[wallX, wallY].WallType = materials.WallType;
 
                         WorldGen.SquareWallFrame(wallX, wallY);
                     }
@@ -163,7 +167,7 @@ namespace InstantBase.Items
                         WorldGen.PlaceTile(
                             origin.X + x,
                             origin.Y + y,
-                            platformTile
+                            materials.PlatformTile
                         );
                     }
                     else if (foregroundBlueprint[y][x] == 'H')
@@ -190,7 +194,7 @@ namespace InstantBase.Items
             WorldGen.PlaceTile(
                 x,
                 y,
-                platformTile
+                materials.PlatformTile
             );
 
             Tile tile = Main.tile[x, y];
