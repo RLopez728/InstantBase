@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
-using Terraria.GameContent.UI.Elements;
 using InstantBase.Items;
 
 namespace InstantBase.UI
@@ -30,7 +29,7 @@ namespace InstantBase.UI
             {
                 _userInterface.SetState(null);
             }
-            
+
             _userInterface?.Update(gameTime);
         }
 
@@ -43,7 +42,7 @@ namespace InstantBase.UI
             if (inventoryIndex != -1)
             {
                 layers.Insert(
-                    inventoryIndex,
+                    inventoryIndex + 1,
                     new LegacyGameInterfaceLayer(
                         "InstantBase: UI",
                         delegate

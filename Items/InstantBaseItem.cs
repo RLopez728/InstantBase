@@ -22,6 +22,10 @@ namespace InstantBase.Items
             PlatformTile = TileID.Platforms
         };
 
+        private Item frameSelectionItem = new Item();
+        private Item wallSelectionItem = new Item();
+        private Item platformSelectionItem = new Item();
+
         public override void SetStaticDefaults()
         {
             Item.ResearchUnlockCount = 1;
@@ -45,6 +49,10 @@ namespace InstantBase.Items
             Item.value = Item.buyPrice(silver:50);
 
             Item.UseSound = SoundID.Item1;
+
+            frameSelectionItem.TurnToAir();
+            wallSelectionItem.TurnToAir();
+            platformSelectionItem.TurnToAir();
         }
 
         public override bool? UseItem(Player player)
@@ -223,10 +231,62 @@ namespace InstantBase.Items
             WorldGen.SquareTileFrame(x, y);
         }
 
-        public void SetFrameTile(ushort tile)
+        public void SetFrameMaterial(Item item)
         {
-            materials.FrameTile = tile;
+            if (item == null || item.IsAir)
+            {
+                materials.FrameTile = TileID.GrayBrick;
+                frameSelectionItem = new Item();
+                frameSelectionItem.TurnToAir();
+                return;
+            }
+
+            if (item.createTile < 0)
+                return;
+
+            materials.FrameTile = (ushort)item.createTile;
+            frameSelectionItem = item.Clone();
         }
+
+        public Item GetFrameSelectionItem() => frameSelectionItem;
+
+        public void SetWallMaterial(Item item)
+        {
+            if (item == null || item.IsAir)
+            {
+                materials.WallType = WallID.GrayBrick;
+                wallSelectionItem = new Item();
+                wallSelectionItem.TurnToAir();
+                return;
+            }
+
+            if (item.createWall < 0)
+                return;
+
+            materials.WallType = (ushort)item.createWall;
+            wallSelectionItem = item.Clone();
+        }
+
+        public Item GetWallSelectionItem() => wallSelectionItem;
+
+        public void SetPlatformMaterial(Item item)
+        {
+            if (item == null || item.IsAir)
+            {
+                materials.PlatformTile = TileID.Platforms;
+                platformSelectionItem = new Item();
+                platformSelectionItem.TurnToAir();
+                return;
+            }
+
+            if (item.createTile < 0)
+                return;
+
+            materials.PlatformTile = (ushort)item.createTile;
+            platformSelectionItem = item.Clone();
+        }
+
+        public Item GetPlatformSelectionItem() => platformSelectionItem;
 
         private void ClearArea(int startX, int startY, int width, int height)
         {
