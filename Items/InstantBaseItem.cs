@@ -90,16 +90,23 @@ namespace InstantBase.Items
 
             Point tilePosition = Main.MouseWorld.ToTileCoordinates();
 
+            var (structureWidth, structureHeight) = GetStructureBounds();
+
             ClearArea(
                 tilePosition.X,
-                tilePosition.Y,
-                frameBlueprint[0].Length,
-                frameBlueprint.Length
+                tilePosition.Y
             );
 
             PlaceFrame(tilePosition);
             PlaceWalls(tilePosition);
             PlaceForeground(tilePosition);
+
+            WorldGen.RangeFrame(
+                tilePosition.X,
+                tilePosition.Y,
+                tilePosition.X + structureWidth,
+                tilePosition.Y + structureHeight
+            );
 
             WorldGen.RangeFrame(
                 tilePosition.X,
@@ -135,9 +142,29 @@ namespace InstantBase.Items
 
             string text = Encoding.UTF8.GetString(bytes);
 
-            return text
+            string[] lines = text
                 .Replace("\r", "")
                 .Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            int maxWidth = lines.Max(line => line.Length);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].Length < maxWidth)
+                {
+                    lines[i] = lines[i].PadRight(maxWidth, ' ');
+                }
+            }
+
+            return lines;
+        }
+
+        private (int width, int height) GetStructureBounds()
+        {
+            int width = new[] { frameBlueprint[0].Length, wallBlueprint[0].Length, foregroundBlueprint[0].Length }.Max();
+            int height = new[] { frameBlueprint.Length, wallBlueprint.Length, foregroundBlueprint.Length }.Max();
+
+            return (width, height);
         }
 
         private void PlaceFrame(Point origin)
@@ -315,18 +342,40 @@ namespace InstantBase.Items
 
         public Item GetPlatformSelectionItem() => platformSelectionItem;
 
-        private void ClearArea(int startX, int startY, int width, int height)
-        {
-            for (int x = startX; x < startX + width; x++)
+        private void ClearArea(int startX, int startY)
             {
-                for (int y = startY; y < startY + height; y++)
-                {
-                    WorldGen.KillTile(x,y);
+                int width = GetStructureBounds().width;
+                int height = GetStructureBounds().height;
 
-                    Main.tile[x,y].WallType = WallID.None;
-                    Main.tile[x,y].LiquidAmount = 0;
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        bool occupied =
+                            (y < frameBlueprint.Length &&
+                            x < frameBlueprint[y].Length &&
+                            frameBlueprint[y][x] == '#')
+                            ||
+                            (y < wallBlueprint.Length &&
+                            x < wallBlueprint[y].Length &&
+                            wallBlueprint[y][x] == 'W')
+                            ||
+                            (y < foregroundBlueprint.Length &&
+                            x < foregroundBlueprint[y].Length &&
+                            foregroundBlueprint[y][x] != ' ');
+
+                        if (!occupied)
+                            continue;
+
+                        int worldX = startX + x;
+                        int worldY = startY + y;
+
+                        WorldGen.KillTile(worldX, worldY);
+
+                        Main.tile[worldX, worldY].WallType = WallID.None;
+                        Main.tile[worldX, worldY].LiquidAmount = 0;
+                    }
                 }
             }
-        }
     }
 }
