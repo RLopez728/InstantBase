@@ -343,39 +343,41 @@ namespace InstantBase.Items
         public Item GetPlatformSelectionItem() => platformSelectionItem;
 
         private void ClearArea(int startX, int startY)
+        {
+            int width = GetStructureBounds().width;
+            int height = GetStructureBounds().height;
+
+            for (int x = 0; x < width; x++)
             {
-                int width = GetStructureBounds().width;
-                int height = GetStructureBounds().height;
-
-                for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
                 {
-                    for (int y = 0; y < height; y++)
-                    {
-                        bool occupied =
-                            (y < frameBlueprint.Length &&
-                            x < frameBlueprint[y].Length &&
-                            frameBlueprint[y][x] == '#')
-                            ||
-                            (y < wallBlueprint.Length &&
-                            x < wallBlueprint[y].Length &&
-                            wallBlueprint[y][x] == 'W')
-                            ||
-                            (y < foregroundBlueprint.Length &&
-                            x < foregroundBlueprint[y].Length &&
-                            foregroundBlueprint[y][x] != ' ');
+                    bool occupied =
+                        (y < frameBlueprint.Length &&
+                        x < frameBlueprint[y].Length &&
+                        frameBlueprint[y][x] == '#')
+                        ||
+                        (y < wallBlueprint.Length &&
+                        x < wallBlueprint[y].Length &&
+                        wallBlueprint[y][x] == 'W')
+                        ||
+                        (y < foregroundBlueprint.Length &&
+                        x < foregroundBlueprint[y].Length &&
+                        foregroundBlueprint[y][x] != ' ');
 
-                        if (!occupied)
-                            continue;
+                    if (!occupied)
+                        continue;
 
-                        int worldX = startX + x;
-                        int worldY = startY + y;
+                    int worldX = startX + x;
+                    int worldY = startY + y;
 
-                        WorldGen.KillTile(worldX, worldY);
+                    Tile tile = Main.tile[worldX, worldY];
 
-                        Main.tile[worldX, worldY].WallType = WallID.None;
-                        Main.tile[worldX, worldY].LiquidAmount = 0;
-                    }
+                    // Instantly remove tile, wall, and liquid
+                    tile.ClearTile();
+                    tile.WallType = WallID.None;
+                    tile.LiquidAmount = 0;
                 }
             }
+        }
     }
 }

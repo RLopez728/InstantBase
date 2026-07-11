@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InstantBase")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f95520c9fd5c1c79254d30dae40d0f0ede9d3e76")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fe981361b134495b425cc2f161cdac2b6b028f57")]
 [assembly: System.Reflection.AssemblyProductAttribute("InstantBase")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InstantBase")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
