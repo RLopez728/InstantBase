@@ -5,5 +5,6 @@ namespace InstantBase.Structures
         public ushort FrameTile;
         public ushort WallType;
         public ushort PlatformTile;
+        public int PlatformStyle;
     }
 }

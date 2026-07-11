@@ -5,6 +5,8 @@ using InstantBase.Items;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ID;
+using InstantBase.Structures;
+using Terraria.ModLoader;
 
 namespace InstantBase.UI
 {
@@ -33,10 +35,10 @@ namespace InstantBase.UI
                 panel = new UIWindowPanel();
 
                 panel.Width.Set(300f, 0f);
-                panel.Height.Set(220f, 0f);
+                panel.Height.Set(260f, 0f);   // bumped from 220f to fit the button
 
                 panel.Left.Set(-150f, 0.5f);
-                panel.Top.Set(-110f, 0.5f);
+                panel.Top.Set(-130f, 0.5f);  // adjusted to keep it centered at the new height
 
                 Append(panel);
 
@@ -46,11 +48,36 @@ namespace InstantBase.UI
                 (frameSlot, _) = AddLabeledSlot("Frame", 0, 3, OnFrameMaterialSelected);
                 (wallSlot, _) = AddLabeledSlot("Wall", 1, 3, OnWallMaterialSelected);
                 (platformSlot, _) = AddLabeledSlot("Platform", 2, 3, OnPlatformMaterialSelected);
+
+                var undoButton = new UIText("Undo Last Build")
+                {
+                    TextColor = Color.White
+                };
+                undoButton.Left.Set(80f, 0f);
+                undoButton.Top.Set(190f, 0f);
+                undoButton.OnLeftClick += (evt, el) => PerformUndo();
+                undoButton.OnMouseOver += (evt, el) => ((UIText)el).TextColor = Color.Orange;
+                undoButton.OnMouseOut += (evt, el) => ((UIText)el).TextColor = Color.White;
+                panel.Append(undoButton);
             }
 
             frameSlot.DisplayItem = currentItem.GetFrameSelectionItem().Clone();
             wallSlot.DisplayItem = currentItem.GetWallSelectionItem().Clone();
             platformSlot.DisplayItem = currentItem.GetPlatformSelectionItem().Clone();
+        }
+
+        private void PerformUndo()
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                StructureBuilder.Undo(Main.myPlayer, out _, out _, out _);
+            }
+            else if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                ModPacket packet = ModContent.GetInstance<InstantBase>().GetPacket();
+                packet.Write((byte)InstantBaseMessageType.UndoRequest);
+                packet.Send();
+            }
         }
 
         private (UIMaterialSlot slot, UIText label) AddLabeledSlot(string labelText, int index, int totalSlots, System.Action<Item> onSelected)

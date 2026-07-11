@@ -4,11 +4,10 @@ Items: {
 			'''
 			[c/FFFF00:W I P]
 			Instantly builds an underground base at your cursor.
-			Right-Click with the item in your hand to set the materials.
-			Not all platform types work for now )^:
+			Right-Click with the item in your hand to set the materials or undo.
 
-			Places top left-most corner of the base.
-			[c/FF0000:DESTRUCTIVE AND VERY BIG, BE CAREFUL]
+			Place where you want the entrance to be.
+			[c/FF0000:DESTRUCTIVE]
 			'''
 		DisplayName: Instant Base Item
 	}

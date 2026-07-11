@@ -6,3 +6,10 @@ This mod adds an item that upon use automatically spawns in an underground bunke
 The bunker uses House Enablers for NPC houses and lighting.
 
 Read the tooltip :^)
+
+v8.2 (I messed up the versions don't yell at me)
+
+-Works in multiplayer now!
+-Now accepts all platforms
+-Added undo button
+-Added preview
