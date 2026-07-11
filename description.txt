@@ -1,1 +1,8 @@
-Modify this file with a description of your mod.
+LuiAFK(Reborn) is required for this mod to work properly.
+
+This mod is still heavily work in progress.
+
+This mod adds an item that upon use automatically spawns in an underground bunker.
+The bunker uses House Enablers for NPC houses and lighting.
+
+Read the tooltip :^)

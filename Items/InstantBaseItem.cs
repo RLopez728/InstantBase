@@ -48,7 +48,7 @@ namespace InstantBase.Items
             Item.maxStack = 1;
             Item.consumable = false;
 
-            Item.rare = ItemRarityID.White;
+            Item.rare = ItemRarityID.Red;
             Item.value = Item.buyPrice(silver:50);
 
             Item.UseSound = SoundID.Item1;
@@ -378,6 +378,41 @@ namespace InstantBase.Items
                     tile.LiquidAmount = 0;
                 }
             }
+        }
+
+        public override void AddRecipes()
+        {
+            if (ModLoader.TryGetMod("miningcracks_take_on_luiafk", out Mod luiAfk))
+            {
+                ModItem houseEnabler = luiAfk.GetContent<ModItem>()
+                    .FirstOrDefault(modItem =>
+                        modItem.DisplayName.Value.Equals("Unlimited House Enabler")
+                    );
+
+                if (houseEnabler != null)
+                {
+                    Recipe recipe = CreateRecipe();
+
+                    recipe.AddIngredient(houseEnabler.Type, 1);
+                    recipe.AddIngredient(ItemID.GrayBrick, 20);
+
+                    recipe.AddTile(TileID.Anvils);
+
+                    recipe.Register();
+                    return;
+                }
+            }
+
+            // Fallback recipe if LuiAFK is not installed
+            Recipe fallbackRecipe = CreateRecipe();
+
+            fallbackRecipe.AddIngredient(ItemID.GrayBrick, 20);
+            fallbackRecipe.AddIngredient(ItemID.Torch, 10);
+            fallbackRecipe.AddIngredient(ItemID.FallenStar, 1);
+
+            fallbackRecipe.AddTile(TileID.Anvils);
+
+            fallbackRecipe.Register();
         }
     }
 }
